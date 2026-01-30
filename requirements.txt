@@ -1,0 +1,24 @@
+groq
+langfuse
+langchain
+langchain-core
+langchain-community
+langchain-groq
+langchain_chroma
+langchain-tavily
+langchain-text-splitters
+langgraph
+langgraph-cli
+langsmith
+sentence-transformers
+python-dateutil
+polyline
+pdf2image
+pypdf
+pytesseract
+torch
+pytesseract
+pdf2image 
+pillow 
+pypdf
+pip install rank_bm25

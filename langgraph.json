@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "travel_assistant": "./graph.py:create_travel_workflow"
+  },
+  "env": ".env"
+}
