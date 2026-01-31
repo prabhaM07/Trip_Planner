@@ -95,7 +95,7 @@ def should_continue_to_tools(state: TravelState):
         return AGENT_META[pending[0]]["node_name"]
 
     if state.get("trip_planner_called"):
-        return "refinement_agent"
+        return "route_optimizer"
 
     return "synthesizer"
 
