@@ -1,11 +1,12 @@
-from langchain_core.messages import SystemMessage, HumanMessage , ToolMessage , AIMessage
+import calendar
+from langchain_core.messages import SystemMessage, HumanMessage , ToolMessage 
 import json
 import re
 import requests
 from datetime import date
 from typing import Optional
 from dateutil import parser
-
+from langgraph.types import interrupt
 from models import invoke_llm
 
 
@@ -123,3 +124,40 @@ def collect_tool_results(messages: list) -> str:
 
     tool_contents.reverse() 
     return "\n\n".join(tool_contents)
+
+def derive_month(from_date, to_date):
+    if not from_date or not to_date:
+        return None
+
+    if from_date.year < to_date.year:
+        return "any"
+    if from_date.month == to_date.month:
+        return calendar.month_name[from_date.month]
+
+    return f"{calendar.month_name[from_date.month]} to {calendar.month_name[to_date.month]}"
+
+
+def ask_for_dates(from_date=None, to_date=None):
+    new_from = parse_date(interrupt({
+        "type": "preference_request",
+        "preference": "from_date",
+        "prev_date": str(from_date) if from_date else None,
+        "question": "Please enter the start date (DD.MM.YYYY):"
+    }))
+
+    new_to = parse_date(interrupt({
+        "type": "preference_request",
+        "preference": "to_date",
+        "prev_date": str(to_date) if to_date else None,
+        "question": "Please enter the end date (DD.MM.YYYY):"
+    }))
+
+    return new_from, new_to
+
+
+def handle_date_update(update, from_date, to_date):
+    update["from_date"] = from_date
+    update["to_date"] = to_date
+
+    if from_date and to_date:
+        update["month"] = derive_month(from_date, to_date)
