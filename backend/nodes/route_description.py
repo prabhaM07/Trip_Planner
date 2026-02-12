@@ -2,8 +2,7 @@ import os
 from travelstate import TravelState
 from service import DistanceService, get_route, reverse_geocode
 from utils import correct_locations_with_llm, invoke_model
-from langfuse import observe
-
+from langfuse.decorators import observe
 
 # Purpose:
 # 

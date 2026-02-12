@@ -4,7 +4,7 @@ from travelstate import TravelState
 from service import DistanceService
 from prompts import build_exact_places_context
 from utils import invoke_model, remove_markdown
-from langfuse import observe
+from langfuse.decorators import observe
 from langchain_core.messages import AIMessage
 
 # Purpose:

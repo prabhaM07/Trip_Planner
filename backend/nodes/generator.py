@@ -1,7 +1,6 @@
 from travelstate import TravelState
 from RAG.generator import ResponseGenerator
-from langfuse import observe
-
+from langfuse.decorators import observe
 
 # Purpose:
 # This node generates the final answer using the user's query and thedocument chunks retrieved from the vector store.

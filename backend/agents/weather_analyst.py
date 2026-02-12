@@ -2,7 +2,7 @@ import uuid
 from travelstate import TravelState
 from prompts import WEATHER_ANALYST_PROMPT, build_weather_analyst_context
 from utils import collect_tool_results, invoke_model
-from langfuse import observe
+from langfuse.decorators import observe
 from langchain_core.messages import ToolMessage, AIMessage
 
 

@@ -4,9 +4,15 @@ from langchain_core.embeddings import Embeddings
 from sentence_transformers import SentenceTransformer
 from typing import List
 import itertools
+from langfuse.callback import CallbackHandler
 from dotenv import load_dotenv 
 load_dotenv()
 
+langfuse_handler = CallbackHandler(
+    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+    host=os.getenv("LANGFUSE_BASE_URL"),
+)
 API_KEYS = os.getenv("GROQ_API_KEYS", "").split(",")
 if not API_KEYS or API_KEYS == [""]:
     raise RuntimeError("No GROQ_API_KEYS found")
@@ -20,7 +26,8 @@ def get_llm_model(api_key : str):
         model="llama-3.3-70b-versatile",
         temperature=0.2,     
         max_tokens=1000,
-        api_key = api_key,   
+        api_key = api_key, 
+        callbacks=[langfuse_handler],  
     )
 
 def get_llm():
@@ -29,6 +36,7 @@ def get_llm():
         temperature=0.2,     
         max_tokens=1000,
         api_key = API_KEYS[0],
+        callbacks=[langfuse_handler],
     )
 
 def invoke_llm(messages):

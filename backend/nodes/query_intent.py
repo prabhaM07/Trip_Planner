@@ -3,7 +3,7 @@ import json
 from travelstate import TravelState
 from prompts import DATE_EXTRACTION_PROMPT, QUERY_INTENT_AGENT_PROMPT, build_date_extraction_context, build_query_intent_context
 from utils import invoke_model, remove_markdown
-from langfuse import observe
+from langfuse.decorators import observe
 from langchain_core.messages import AIMessage
 
 

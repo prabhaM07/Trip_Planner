@@ -1,18 +1,15 @@
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
-
 from agents.synthesizer import synthesizer_node
 from agents.trip_planner import trip_planner_node
 from agents.weather_analyst import weather_analyst_node
 from agents.general_assistant import general_query_node
-
 from nodes.ask_preference import ask_preference_node
 from nodes.route_description import route_description_node
 from nodes.route_optimizer import route_optimizer_node
 from nodes.query_intent import query_intent_node
 from nodes.retriever import retriever_node
 from nodes.generator import generator_node
-
 from routes import (
     route_after_generator,
     route_after_query_intent,
@@ -23,12 +20,8 @@ from langgraph.prebuilt import ToolNode
 from tools import web_search, get_weather
 from models import get_llm
 from travelstate import TravelState
-from langfuse import get_client
 from dotenv import load_dotenv
 load_dotenv()
-
-langfuse = get_client()
-
 
 def create_travel_workflow():
     llm = get_llm()

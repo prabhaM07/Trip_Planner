@@ -2,7 +2,7 @@ import calendar
 from travelstate import TravelState
 from preferences import PREFERENCES
 from utils import ask_for_dates, derive_month, handle_date_update, parse_date , is_null
-from langfuse import observe
+from langfuse.decorators import observe
 from langgraph.types import Command, interrupt
 
 
@@ -45,7 +45,6 @@ def ask_preference_node(state: TravelState):
     }
     
 
-    
 
     if state.get("preferences_collected"):
         return Command(goto="route_description", update=update)

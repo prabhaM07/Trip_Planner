@@ -1,10 +1,9 @@
 from travelstate import TravelState
 from prompts import SYNTHESIZER_PROMPT
 from utils import invoke_model
-from langfuse import observe
+from langfuse.decorators import observe
 from langchain_core.messages import  AIMessage
 from langgraph.types import  interrupt
-
 
 
 
@@ -46,14 +45,12 @@ def synthesizer_node(state: TravelState, llm) -> dict:
             {update_query}
             """
     
-    # If nothing to synthesize, return early
     if not any([trip_plan, weather_info, general_info, pdf_info]):
         return {
             "messages": [AIMessage(content="I couldn't gather enough information to answer your query.")],
         }
     
 
-    # Build collected information block
     collected_sections = []
     if trip_plan:
         collected_sections.append(f"TRIP ITINERARY:\n{trip_plan}")
@@ -66,7 +63,6 @@ def synthesizer_node(state: TravelState, llm) -> dict:
 
     collected_info_block = "\n\n".join(collected_sections)
 
-    # Build instructions for synthesis
     instructions = [
         "if the update request given : modify the existing plan instead of creating a completely new one"
         "Present the itinerary clearly based on the user query",
@@ -79,10 +75,8 @@ def synthesizer_node(state: TravelState, llm) -> dict:
     ]
     instructions_block = "\n- " + "\n- ".join(instructions)
 
-    # Include optimized route if available
     optimized_route_block = f"DISTANCE-OPTIMIZED SEQUENCE:\n{optimized_route}\n" if optimized_route else ""
 
-    # Final context for the LLM
     context = f"""
     USER QUERY:
     {user_query}
@@ -98,7 +92,6 @@ def synthesizer_node(state: TravelState, llm) -> dict:
     SYNTHESIS INSTRUCTIONS:{instructions_block}
     """.strip()
 
-    # Generate final synthesized response
     final_response = invoke_model(
         systemMessage=SYNTHESIZER_PROMPT,
         humanMessage=context

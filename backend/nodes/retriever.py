@@ -2,8 +2,7 @@ from pathlib import Path
 from travelstate import TravelState
 from RAG.retriever import Retriever
 from models import get_embedding_model
-from langfuse import observe
-
+from langfuse.decorators import observe
 
 # Purpose:
 # This node retrieves the most relevant text chunks from a PDF-based vector store based on the user's query. 

@@ -1,9 +1,8 @@
-
 import uuid
 from travelstate import TravelState
 from prompts import TRIP_PLANNER_PROMPT , build_trip_planner_context_with_pdf_data, build_trip_planner_context_with_preferences
 from utils import collect_tool_results, invoke_model
-from langfuse import observe
+from langfuse.decorators import observe
 from langchain_core.messages import ToolMessage, AIMessage
 
 

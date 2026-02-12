@@ -2,9 +2,8 @@ import uuid
 from travelstate import TravelState
 from prompts import GENERAL_QUERY_PROMPT, build_general_assistant_context
 from utils import collect_tool_results, invoke_model, is_greeting_via_llm
-from langfuse import observe
+from langfuse.decorators import observe
 from langchain_core.messages import ToolMessage, AIMessage
-
 
 
 # Purpose:

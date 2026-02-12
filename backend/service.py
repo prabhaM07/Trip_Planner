@@ -9,7 +9,6 @@ class DistanceService:
         self._geo_cache = {}       # place -> (lat, lon)
         self._distance_cache = {}  # (placeA, placeB) -> km
 
-    # GEOCODING 
     def geocode(self, place: str):
 
         if place in self._geo_cache:
@@ -26,7 +25,6 @@ class DistanceService:
         lon, lat = r["features"][0]["geometry"]["coordinates"]
         self._geo_cache[place] = (lat, lon)
         return lat, lon
-    import math
 
     def haversine_km(self, lat1, lon1, lat2, lon2):
         R = 6371.0  # Earth radius in km
@@ -97,7 +95,6 @@ class DistanceService:
                     nearest_place = place
 
             if nearest_place is None:
-                # Fallback: just take the next available place
                 nearest_place = remaining[0]
             
             route.append(nearest_place)
@@ -120,12 +117,10 @@ def get_route(
             "geometry": []
         }
 
-    # Prepare fallback geometry (start → end)
     start_lon, start_lat = coordinates[0]
     end_lon, end_lat = coordinates[-1]
     fallback_geometry = [(start_lat, start_lon), (end_lat, end_lon)]
 
-    # Geoapify expects: lat,lon|lat,lon
     waypoints = "|".join(
         f"{lat},{lon}" for lon, lat in coordinates
     )
@@ -194,7 +189,6 @@ def get_route(
         }
 
     except Exception:
-        # Absolute last-resort fallback
         return {
             "distance_km": 0,
             "duration_min": 0,

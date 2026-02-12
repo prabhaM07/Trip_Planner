@@ -1,21 +1,18 @@
-from fastapi import FastAPI
+import os
+import uuid
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional, List, Union, Dict
 from dotenv import load_dotenv
-
+from fastapi.middleware.cors import CORSMiddleware
 from langgraph.types import Command
-from langgraph.checkpoint.memory import MemorySaver
-
 from graph import create_travel_workflow
 from travelstate import TravelState
 
 load_dotenv()
 
-# ------------------ APP ------------------
-
 app = FastAPI(title="AI Travel Assistant")
-
-from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,12 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ------------------ GRAPH ------------------
-
-memory = MemorySaver()
 graph = create_travel_workflow()
-
-# ------------------ REQUEST MODEL ------------------
 
 class ChatRequest(BaseModel):
     user_query: Optional[str] = None
@@ -38,7 +30,6 @@ class ChatRequest(BaseModel):
     session_id: str
     pdf: Optional[str] = None
 
-# ------------------ RESPONSE MODELS ------------------
 
 class FinalResponse(BaseModel):
     type: str = "final"
@@ -54,7 +45,8 @@ class InterruptResponse(BaseModel):
     trip_plan: Optional[str] = None
     meta: Dict = {}
 
-# ------------------ ENDPOINT ------------------
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post(
     "/travel",
@@ -68,31 +60,25 @@ def travel_assistant(request: ChatRequest):
         }
     }
 
-    # RESUME AFTER INTERRUPT
     if request.interrupt_response is not None:
         result = graph.invoke(
             Command(resume=request.interrupt_response),
             config=config
         )
 
-    # INITIAL MESSAGE
     else:
-        initial_state = TravelState(user_query=request.user_query)
+        initial_state = TravelState(user_query=request.user_query,pdf_path=request.pdf if request.pdf else None)
         result = graph.invoke(initial_state, config=config)
 
-    # INTERRUPT
     if "__interrupt__" in result:
         interrupt_data = result["__interrupt__"][0].value
         
-        # Use 'key' instead of 'preference'
         preference_key = interrupt_data.get("key")
         question = interrupt_data.get("question", "")
         interrupt_type = interrupt_data.get("type")
         
-        # Use input_type directly from interrupt_data if provided
         input_type = interrupt_data.get("input_type")
         
-        # Fallback logic if input_type not in interrupt_data
         if not input_type:
             if interrupt_type == "confirmation_request":
                 input_type = "confirm"
@@ -116,10 +102,38 @@ def travel_assistant(request: ChatRequest):
             meta=interrupt_data.get("meta", {})
         )
 
-    # FINAL ANSWER
     return FinalResponse(
         answer=result.get(
             "final_result",
             "Sorry, I couldn't process your request."
         )
     )
+
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+
+    allowed_types = {
+        "application/pdf",
+        "image/png",
+        "image/jpeg"
+    }
+
+    if file.content_type not in allowed_types:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF, PNG, JPG files are allowed"
+        )
+    file_ext = os.path.splitext(file.filename)[1]
+    file_name = f"{uuid.uuid4()}{file_ext}"
+    file_path = os.path.join(UPLOAD_DIR, file_name)
+
+    with open(file_path, "wb") as f:
+        f.write(await file.read())
+
+    return JSONResponse({
+        "path": file_path
+    })
+
+
