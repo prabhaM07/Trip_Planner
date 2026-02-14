@@ -1,4 +1,4 @@
-import { useAppSelector } from "../../../app/hook";
+import { useAppSelector } from "../../../app/hooks";
 import InterruptBox from "./InterruptBox";
 
 const ChatMessages = () => {
@@ -77,7 +77,7 @@ const ChatMessages = () => {
             Bot
           </div>
           <div style={{ fontSize: 13, color: "#666" }}>
-            ⏳ Processing...
+           Processing...
           </div>
         </div>
       )}

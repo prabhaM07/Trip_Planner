@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../app/hook";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { sendMessage } from "../slices/chatSlice";
 
 type Interrupt = {
@@ -74,9 +74,13 @@ const InterruptBox = ({ interrupt, fromDate, disabled = false }: Props) => {
           }}
         >
           <div style={{ fontWeight: "bold", marginBottom: 8 }}>
-            📋 Your Trip Plan
+            Your Trip Plan
           </div>
-          <div style={{ whiteSpace: "pre-wrap" }}>{interrupt.trip_plan}</div>
+          <div dangerouslySetInnerHTML={{
+                  __html: interrupt.trip_plan
+                    .replace(/### (.*?)(\n|$)/g, "<h3>$1</h3>")
+                    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+                }} style={{ whiteSpace: "pre-wrap" }}/>
         </div>
       )}
 
@@ -150,7 +154,8 @@ const InterruptBox = ({ interrupt, fromDate, disabled = false }: Props) => {
             disabled={isDisabled}
             onChange={(e) => setValue(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && submit(value)}
-            style={{ marginRight: 6 }}
+            
+            style={{ marginRight: 6 ,  }}
           />
           <button disabled={isDisabled} onClick={() => submit(value)}>
             Send

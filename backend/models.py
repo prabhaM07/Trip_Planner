@@ -20,7 +20,6 @@ if not API_KEYS or API_KEYS == [""]:
 # Infinite round-robin key rotation
 key_cycle = itertools.cycle(API_KEYS)
 
-
 def get_llm_model(api_key : str):
     return ChatGroq(
         model="llama-3.3-70b-versatile",

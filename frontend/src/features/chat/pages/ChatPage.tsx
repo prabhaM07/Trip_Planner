@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import Lottie from "lottie-react";
-import ChatInput from "../features/chat/components/ChatInput";
-import ChatMessages from "../features/chat/components/ChatMessages";
-import animation from "../animations/animate1.json";
-import { useAppSelector } from "../app/hook";
+import ChatInput from "../components/ChatInput";
+import ChatMessages from "../components/ChatMessages";
+import animation from "../../../animations/animate1.json";
+import { useAppSelector } from "../../../app/hooks";
 
 const ChatPage = () => {
   const scrollRef = useRef<HTMLDivElement>(null);

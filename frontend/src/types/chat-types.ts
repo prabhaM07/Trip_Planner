@@ -19,4 +19,9 @@ export type Message =
     };
 
 
-    
+export type ChatState = {
+  messages: Message[];
+  loading: boolean;
+  sessionId: string;
+  hasActiveInterrupt : boolean;
+};

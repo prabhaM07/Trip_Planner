@@ -1,5 +1,5 @@
 
-import ChatPage from "./pages/ChatPage";
+import ChatPage from "./features/chat/pages/ChatPage";
 import "./index.css";
 
 const App = () => {

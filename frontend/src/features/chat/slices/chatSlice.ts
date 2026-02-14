@@ -1,12 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { sendMessageToBackend } from "../../../services/chatApi";
-import type { Message, InterruptPayload } from "../types";
-
-type ChatState = {
-  messages: Message[];
-  loading: boolean;
-  sessionId: string;
-};
+import { sendMessageToBackend } from "../services/chatApi";
+import type { ChatState, InterruptPayload } from "../../../types/chat-types";
 
 const generateSessionId = () =>
   `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -15,12 +9,13 @@ const initialState: ChatState = {
   messages: [],
   loading: false,
   sessionId: generateSessionId(),
+  hasActiveInterrupt: false
 };
 
 export const sendMessage = createAsyncThunk(
   "chat/sendMessage",
   async (
-    payload: { text?: string; interruptAnswer?: string },
+    payload: { text?: string; interruptAnswer?: string; pdf?: string },
     { getState }
   ) => {
     const state = getState() as { chat: ChatState };
@@ -28,7 +23,8 @@ export const sendMessage = createAsyncThunk(
     const response = await sendMessageToBackend(
       payload.text,
       payload.interruptAnswer,
-      state.chat.sessionId
+      state.chat.sessionId,
+      payload.pdf
     );
 
     return response;
@@ -51,9 +47,12 @@ const chatSlice = createSlice({
       .addCase(sendMessage.pending, (state, action) => {
         state.loading = true;
 
-        const { text, interruptAnswer } = action.meta.arg;
+        const { text, interruptAnswer, pdf } = action.meta.arg;
 
-        if (text) {
+        if(pdf){
+          state.messages.push({ sender: "user", text: `${text} and Uploaded PDF path: ${pdf}` });
+        }
+        else if(text) {
           state.messages.push({ sender: "user", text });
         }
 
@@ -69,11 +68,15 @@ const chatSlice = createSlice({
         const res = action.payload;
 
         if (res.type === "interrupt") {
+          state.loading = false;
+          state.hasActiveInterrupt = true;
           state.messages.push({
             sender: "bot",
             interrupt: res as InterruptPayload,
           });
         } else {
+          state.loading = false;
+          state.hasActiveInterrupt = false;
           state.messages.push({
             sender: "bot",
             text: res.answer,
